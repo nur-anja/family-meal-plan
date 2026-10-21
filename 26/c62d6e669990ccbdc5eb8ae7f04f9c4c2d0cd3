@@ -1,0 +1,39 @@
+.claude/skills/family-meal-planner/SKILL.md
+  s_abba7e92de55c9::t_55d1776a6eb931 1-53
+.claude/skills/family-meal-planner/checklist-panel.html
+  s_58430d88d382e5::t_1a33a32678cdba 1-70
+.gitignore
+  s_b971a4be4739ab::t_d197c3023ea051 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "26c62d6e669990ccbdc5eb8ae7f04f9c4c2d0cd3",
+  "prompts": {},
+  "sessions": {
+    "s_58430d88d382e5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7b7cba02-c2b4-4980-9813-fdd180fd8caa",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "nur-anja <205066028+nur-anja@users.noreply.github.com>"
+    },
+    "s_abba7e92de55c9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bc08a59a-0f4a-450f-bac2-67ff442d8b5b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "nur-anja <205066028+nur-anja@users.noreply.github.com>"
+    },
+    "s_b971a4be4739ab": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ef031600-d6a2-4359-a6c8-8eae6275e25f",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "nur-anja <205066028+nur-anja@users.noreply.github.com>"
+    }
+  }
+}
