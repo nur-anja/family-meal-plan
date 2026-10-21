@@ -1,0 +1,49 @@
+<h2 class="sr-only">Multi-select choice form: tap any number of options, then send the selection to chat.</h2>
+<style>
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;align-items:flex-start;text-align:left;min-width:170px;max-width:230px;box-shadow:0 1px 2px rgba(0,0,0,0.04)}
+.opt .t{font-size:13px;font-weight:500}
+.opt .s{font-size:11px;color:var(--text-muted)}
+.err{font-size:13px;color:var(--text-danger);display:none}
+.send{height:36px;padding:0 18px;border:none;border-radius:var(--radius);background:var(--fill-accent,#185FA5);color:var(--on-accent,#fff);font-size:14px;font-weight:500;display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+.send:hover{background:var(--fill-accent-hover,#0C447C)}
+.send:active{transform:scale(0.98)}
+</style>
+<form class="elicit" onsubmit="return false">
+  <div class="elicit-header">
+    <svg viewBox="0 0 20 20" fill="currentColor"><path d="M11.586 2a1.5 1.5 0 0 1 1.06.44l2.914 2.914a1.5 1.5 0 0 1 .44 1.06V16.5a1.5 1.5 0 0 1-1.5 1.5h-9a1.5 1.5 0 0 1-1.492-1.347L4 16.5v-13A1.5 1.5 0 0 1 5.5 2zM5.5 3a.5.5 0 0 0-.5.5v13a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5V7h-2.5A1.5 1.5 0 0 1 11 5.5V3zm7.04 10.304a.5.5 0 0 1 .92.392c-.295.69-.871 1.304-1.66 1.304-.487 0-.892-.234-1.2-.574-.309.34-.713.574-1.2.574-.486 0-.892-.233-1.2-.574-.31.34-.714.574-1.2.574a.5.5 0 0 1 0-1c.212 0 .52-.18.74-.696l.034-.067a.5.5 0 0 1 .886.067c.221.516.528.696.74.696.213 0 .52-.18.74-.696l.035-.067a.5.5 0 0 1 .885.067c.22.516.527.696.74.696s.519-.18.74-.696m0-4a.5.5 0 0 1 .92.392c-.295.69-.871 1.304-1.66 1.304-.487 0-.892-.234-1.2-.574-.309.34-.713.574-1.2.574-.486 0-.892-.233-1.2-.574-.31.34-.714.574-1.2.574a.5.5 0 0 1 0-1c.212 0 .52-.18.74-.696l.034-.067a.5.5 0 0 1 .886.067c.221.516.528.696.74.696.213 0 .52-.18.74-.696l.035-.067a.5.5 0 0 1 .885.067c.22.516.527.696.74.696s.519-.18.74-.696M12 5.5a.5.5 0 0 0 .5.5h2.293L12 3.207z"/></svg>
+    <span>Menu details</span>
+  </div>
+  <div class="elicit-body">
+    <div class="elicit-group">
+      <label class="elicit-question" id="qtext">Which carbs do you want across the 3 dishes? Pick up to 3, one per dish.</label>
+      <div class="opts" id="opts"></div>
+      <span class="err" id="err"></span>
+    </div>
+  </div>
+  <div class="elicit-footer">
+    <button type="button" id="send" class="send"><i class="ti ti-send" aria-hidden="true"></i>Send to chat</button>
+  </div>
+</form>
+<script>
+const label="Carbs";
+const max=3;
+const opts=[
+["Baby potatoes","Roast on the fish sheet pan"],
+["Pre-cut sweet potatoes","Sheet pan, soft for her"],
+["Basmati rice","Instant Pot, under the chicken stew"],
+["Bulgur","10 minutes, soaks up sauce"],
+["Couscous","5-minute soak, no cooking"],
+["Orzo","One-pot with sauce"],
+["Wholewheat pasta","Quick on the stove"],
+["Pita / Vollkorn bread","No cooking, for dipping"]];
+const state=new Map();const box=document.getElementById('opts');const err=document.getElementById('err');
+opts.forEach(([t,s])=>{const b=document.createElement('button');b.type='button';b.className='elicit-pill opt';b.dataset.value=t;b.setAttribute('aria-pressed','false');state.set(b,false);
+const a=document.createElement('span');a.className='t';a.textContent=t;b.appendChild(a);
+if(s){const c=document.createElement('span');c.className='s';c.textContent=s;b.appendChild(c);}
+b.addEventListener('click',e=>{e.preventDefault();const on=!state.get(b);if(on&&[...state.values()].filter(Boolean).length>=max){err.textContent=`You can pick up to ${max}. Unselect one first`;err.style.display='block';setTimeout(()=>b.setAttribute('aria-pressed','false'),0);return;}state.set(b,on);err.style.display='none';setTimeout(()=>b.setAttribute('aria-pressed',on?'true':'false'),0);});
+box.appendChild(b);});
+document.getElementById('send').onclick=()=>{const sel=[...state].filter(([,on])=>on).map(([b])=>b.dataset.value);
+if(!sel.length){err.textContent='Pick at least one option first';err.style.display='block';return;}
+sendPrompt(`${label}: ${sel.join(', ')}`);};
+</script>

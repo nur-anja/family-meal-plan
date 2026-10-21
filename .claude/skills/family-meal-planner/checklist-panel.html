@@ -1,0 +1,70 @@
+<h2 class="sr-only">Checklist form: ingredient pills grouped by question; tapping a pill reveals a quantity field with its unit. Yes/no items are pills to mark as missing.</h2>
+<style>
+.it{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
+.it input{width:56px;height:30px;font-size:13px;text-align:center;padding:0 4px}
+.it .u,.it .nd{font-size:12px;color:var(--text-secondary)}
+.it .nd{color:var(--text-muted)}
+.col{display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+.send{height:36px;padding:0 18px;border:none;border-radius:var(--radius);background:var(--fill-accent,#185FA5);color:var(--on-accent,#fff);font-size:14px;font-weight:500;display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+.send:hover{background:var(--fill-accent-hover,#0C447C)}
+.send:active{transform:scale(0.98)}
+</style>
+<form class="elicit" onsubmit="return false">
+  <div class="elicit-header">
+    <svg viewBox="0 0 20 20" fill="currentColor"><path d="M11.586 2a1.5 1.5 0 0 1 1.06.44l2.914 2.914a1.5 1.5 0 0 1 .44 1.06V16.5a1.5 1.5 0 0 1-1.5 1.5h-9a1.5 1.5 0 0 1-1.492-1.347L4 16.5v-13A1.5 1.5 0 0 1 5.5 2zM5.5 3a.5.5 0 0 0-.5.5v13a.5.5 0 0 0 .5.5h9a.5.5 0 0 0 .5-.5V7h-2.5A1.5 1.5 0 0 1 11 5.5V3zm7.04 10.304a.5.5 0 0 1 .92.392c-.295.69-.871 1.304-1.66 1.304-.487 0-.892-.234-1.2-.574-.309.34-.713.574-1.2.574-.486 0-.892-.233-1.2-.574-.31.34-.714.574-1.2.574a.5.5 0 0 1 0-1c.212 0 .52-.18.74-.696l.034-.067a.5.5 0 0 1 .886.067c.221.516.528.696.74.696.213 0 .52-.18.74-.696l.035-.067a.5.5 0 0 1 .885.067c.22.516.527.696.74.696s.519-.18.74-.696m0-4a.5.5 0 0 1 .92.392c-.295.69-.871 1.304-1.66 1.304-.487 0-.892-.234-1.2-.574-.309.34-.713.574-1.2.574-.486 0-.892-.233-1.2-.574-.31.34-.714.574-1.2.574a.5.5 0 0 1 0-1c.212 0 .52-.18.74-.696l.034-.067a.5.5 0 0 1 .886.067c.221.516.528.696.74.696.213 0 .52-.18.74-.696l.035-.067a.5.5 0 0 1 .885.067c.22.516.527.696.74.696s.519-.18.74-.696M12 5.5a.5.5 0 0 0 .5.5h2.293L12 3.207z"/></svg>
+    <span id="title"></span>
+  </div>
+  <div class="elicit-body" id="body"></div>
+  <div class="elicit-footer">
+    <button type="button" id="send" class="send"><i class="ti ti-send" aria-hidden="true"></i>Send to chat</button>
+  </div>
+</form>
+<script>
+// Pantry check mode: "have" and "missing" sections in one panel.
+// "have": items with amounts (tins, packs, grams) as [name, needed amount, unit]; an untapped item means I have none and need the full amount.
+// "missing": yes/no basics (spices, oil, baking paper) as plain names.
+const title="Pantry details",prefix="Pantry check",hint="";
+const sections=[
+{type:"have",q:"Do you have any of these on hand? Tap it and enter how much.",items:[["Chopped tomatoes",4,"tins"],["Chickpeas (480g)",2,"tins"],["Orzo",300,"g"]]},
+{type:"missing",q:"Which spices and basics are you missing or low on?",items:["Cumin","Sweet paprika","Olive oil"]}
+];
+// Staples restock mode: "buy" sections only in one panel, one section per group, items as [name, unit]
+// (unit shown as "× <unit>", or "" for a free-text "which?" field). Tapping an item reveals a quantity field prefilled with 1. E.g.
+// const title="Staples details",prefix="Staples restock",hint="Tap an item, then adjust the quantity. * I'll show you the flavors available in the store next.";
+// const sections=[{type:"buy",q:"Which dairy and eggs should I restock?",items:[["Eggs","× pack of 10"],["Cream cheese *","× pack"],["Fruits *",""]]}];
+document.getElementById('title').textContent=title;
+const state=new Map();const rows=[];const body=document.getElementById('body');
+const el=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e;};
+const mk=(t,cb)=>{const b=el('button','elicit-pill',t);b.type='button';b.dataset.value=t;b.setAttribute('aria-pressed','false');state.set(b,false);
+b.addEventListener('click',e=>{e.preventDefault();const on=!state.get(b);state.set(b,on);setTimeout(()=>b.setAttribute('aria-pressed',on?'true':'false'),0);if(cb)cb(on);});return b;};
+sections.forEach(s=>{
+const g=el('div','elicit-group');g.appendChild(el('label','elicit-question',s.q));
+const c=el('div','col');g.appendChild(c);body.appendChild(g);
+if(s.type==='missing'){c.style.cssText='display:flex;flex-wrap:wrap;gap:8px';s.items.forEach(n=>{const b=mk(n);c.appendChild(b);rows.push({type:s.type,n,b});});return;}
+s.items.forEach(it=>{
+const w=el('span','it');const inp=el('input');inp.type='text';
+const ex=el('span');ex.style.cssText='display:none;align-items:center;gap:6px';
+let row;
+if(s.type==='have'){const [n,need,u]=it;inp.value=need;inp.setAttribute('aria-label',n+' amount on hand');
+ex.append(el('span','nd','·'),inp,el('span','u',u+' on hand'));row={type:s.type,n,need,u,inp};}
+else{const [n,u]=it;inp.setAttribute('aria-label',n+' quantity');
+if(u===''){inp.placeholder='which?';inp.style.width='130px';}else inp.value='1';
+ex.append(inp);if(u)ex.append(el('span','u',u));row={type:s.type,n,u,inp};}
+row.b=mk(row.n,on=>{ex.style.display=on?'inline-flex':'none';if(on){inp.focus();inp.select();}});
+w.append(row.b);if(s.type==='have')w.append(el('span','nd',`needs ${row.need} ${row.u}`));w.append(ex);
+c.appendChild(w);rows.push(row);});});
+if(hint){const h=el('div',null,hint);h.style.cssText='font-size:12px;color:var(--text-muted)';body.appendChild(h);}
+document.getElementById('send').onclick=()=>{
+const enough=[],some=[],buy=[],miss=[],restock=[];
+rows.forEach(r=>{const on=state.get(r.b);
+if(r.type==='missing'){if(on)miss.push(r.n);return;}
+const v=r.inp.value.trim();
+if(r.type==='buy'){if(on)restock.push(v?`${r.n}: ${v}${r.u?' '+r.u:''}`:r.n);return;}
+const x=parseFloat(v);
+if(!on||(!isNaN(x)&&x<=0))buy.push(`${r.n} (${r.need} ${r.u})`);else if(!isNaN(x)&&x>=r.need)enough.push(r.n);else some.push(`${r.n}: have ${v||'?'} of ${r.need} ${r.u}`);});
+const has=t=>sections.some(s=>s.type===t),l=a=>a.join(', ')||'none',parts=[];
+if(has('have'))parts.push(`Have enough: ${l(enough)}`,`Have some: ${l(some)}`,`Need to buy: ${l(buy)}`);
+if(has('missing'))parts.push(`Missing spices/basics: ${l(miss)}`);
+if(has('buy'))parts.push(`Restock: ${l(restock)}`);
+sendPrompt(`${prefix} — ${parts.join(' · ')}`);};
+</script>
