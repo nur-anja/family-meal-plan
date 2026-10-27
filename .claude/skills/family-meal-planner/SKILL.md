@@ -1,6 +1,6 @@
 ---
 name: family-meal-planner
-description: Plan my family's meals and build my online grocery cart following my cooking rules. Use when I ask what to cook, for a meal plan or menu, or to fill my grocery cart.
+description: Plan my family's meals following my cooking rules, then fill my online grocery cart and/or give me a list for shopping in a physical store. Use when I ask what to cook, for a meal plan or menu, for a shopping list, or to fill my grocery cart.
 ---
 
 # My meal planning and grocery workflow
@@ -11,21 +11,33 @@ Read the cooking-rules.md - it contains personal information about my household 
 
 1. In preparation of planning, ask me (unless I already told you in my request): 
     1. How many meals or days I want to cook for, and whether that includes any special occasion days mentioned in cooking rules (Freeform)
-    2. Do I have any ingredients that I need to use up (Freeform)
-    3. Any cuisine I'm in the mood for (AskUserQuestion)
-    4. Any particular recipes or ingredient I'm in the mood for (Freeform)
-2. Each meal should contain protein, carbs and veggies. These are nutritional components, not separate dishes: one dish can cover all three (e.g. a stew with chicken, potatoes and carrots, or a pasta bake with lentils and spinach), or a meal can combine a main with sides. For each component, ask me what I want (aside from what I already have and what I've mentioned I'm in the mood for) (ChoicePanel). Make sure we have variety of all three components to cover all meals without too much repetition. 
-3. When we're set on components, offer me up to 3 recipes per meal to choose from that fit my rules. (AskUserQuestion - repeat for each meal)
-4. You give me the final menu with ingredients listed, price estimation per meal and total cart price as if I have none of the ingredients at home (before adding staples). Ask me if I want to adjust anything. (Freeform)
-5. Give me a parallel cooking plan, see Cooking plan section.
-6. For pantry staples (oil, salt, spices, condiments) ask me if I'm missing anything. For the rest of the items, ask me if I already have it, or, if I already stated that I have - whether I have enough for your plan. (ChecklistPanel, pantry check mode) After I answer, give me the adjusted total cart price without the items I already have.
-7. Ask me if I plan to get any ingredients in brick and mortar store, or order everything from the online store. (AskUserQuestion. If I want to shop in brick and mortar, follow up with a ChoicePanel of the shopping list items, no `max`: which will I buy in store?)
-8. Ask me if we need to replenish anything from staples.md. (ChecklistPanel, staples restock mode, one section per group in staples.md)
-    1. For checked items marked with *, ask me which flavors/variety I want out of those offered in the online store.
-9. After I confirm, you can fill the online store cart, see Ordering from the online store section.
-10. If I said I plan to partly shop in brick and mortar store, give me the grocery list to take with me to the store.
+    2. How I'm shopping this time: online store only, physical store only, or a mix (AskUserQuestion)
+    3. Do I have any ingredients that I need to use up (Freeform)
+    4. Any cuisine I'm in the mood for (AskUserQuestion)
+    5. Any particular recipes or ingredient I'm in the mood for (Freeform)
+2. Work out how many distinct dishes are needed from the cooking rules (e.g. cook once, eat twice), then offer me up to 3 recipes per dish to choose from that fit my rules (AskUserQuestion - repeat for each dish). Each meal should contain protein, carbs and veggies. These are nutritional components, not separate dishes: one dish can cover all three (like one pot dinner), or a meal can combine a main with sides. 
+3. You give me the final menu with ingredients listed, price estimation per meal and total price as if I have none of the ingredients at home (before adding staples). Ask me if I want to adjust anything. (Freeform)
+4. For pantry staples (oil, salt, spices, condiments) ask me if I'm missing anything. For the rest of the items, ask me if I already have it, or, if I already stated that I have - whether I have enough for your plan. (ChecklistPanel, pantry check mode) After I answer, give me the adjusted total price without the items I already have.
+5. Ask me if we need to replenish anything from staples.md. (ChecklistPanel, staples restock mode, one section per group in staples.md) After I answer, give me the price of the checked staples and the new total including them.
+6. If I'm shopping in a mix, ask me which items I'll buy in the physical store (ChoicePanel, no `max`). Offer one combined list: the meal plan ingredients I still need plus the staples I checked. The rest goes to the online store.
+7. For checked staples marked with * that go to the online store, ask me which flavors/variety I want out of those offered there (Freeform, give the numbered list and I type the number that I want). Don't ask for the ones going to the physical store; I'll pick there.
+8. After I confirm, fill the online store cart with the online items, see Ordering from the online store section. Skip if I'm shopping only in the physical store.
+9. Give me the list for the physical store with the physical store items, see Shopping in the physical store section. Skip if I'm shopping only online.
+10. Give me a parallel cooking plan, see Cooking plan section.
+
+## Prices
+
+- All prices come from the online store, as estimates for items I'll buy in the physical store too.
+- If no online store is connected, skip every price estimate in the workflow.
+
+## Finding products in the online store
+
+- Product names don't always state the property I need (frozen, pre-cut, unsalted, vegan, etc.). Don't judge a search result by its name alone: open the details of every plausible result before saying a product isn't available.
+- If a search that includes the property comes back empty, search again for just the ingredient and check the results' details.
 
 ## Asking me questions
+
+Ask the workflow questions strictly in the order listed, one question per turn, skipping only the ones I already answered. Don't reorder, batch or regroup questions.
 
 When the workflow specifies a question, it needs to be asked in correct format. Some questions already specify what format to use, for other use the guidelines below. 
 - Freeform: just plain text in chat
@@ -38,6 +50,7 @@ Other notes:
 - If nothing fits, use Freeform. 
 - Never trim options or merge items to fit 4.
 
+
 ## Cooking plan
 
 - Check the cooking rules for cooking plan constraints (how the cooking is split between days, time spent cooking, etc).
@@ -46,8 +59,16 @@ Other notes:
 
 ## Ordering from the online store
 
-- Except for the ingredients I said I want to get in brick and mortar store, I should be able to get all ingredients for the dishes from the online store, both base and condiments. 
+- Only add the items I didn't assign to the physical store. I should be able to get all of them from the online store, both base and condiments.
 - Before adding anything, check the cart for items already in it and ask me whether to keep or remove them.
 - After filling the cart, check it again for unavailable items and swap in a reasonable substitute, telling me what changed.
-- If any ingredients are not available and there are no reasonable substitutes, let me know. 
+- If any ingredients are not available and there are no reasonable substitutes, let me know.
+- Tell me the cart total for the items you added, as shown in the online store after substitutions.
 - I do the last step with scheduling the delivery and paying myself through browser.
+
+## Shopping in the physical store
+
+- Give me the list in chat as a checklist I can tick off on my phone, grouped by store section (produce, meat and fish, dairy, bakery, dry goods, frozen, household), in the order I'd walk through a typical supermarket.
+- Each item gets the total quantity to buy across all meals (e.g. "Onions — 4", not one line per recipe) and the package size to look for when it matters.
+- Add a short note next to items whose label you couldn't check in the online store, saying what to check according to cooking rules (allergens etc), and a fallback if it's sold out (e.g. "or frozen spinach").
+- End with the estimated total for the physical store part.

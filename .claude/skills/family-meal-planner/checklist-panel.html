@@ -30,7 +30,7 @@ const sections=[
 ];
 // Staples restock mode: "buy" sections only in one panel, one section per group, items as [name, unit]
 // (unit shown as "× <unit>", or "" for a free-text "which?" field). Tapping an item reveals a quantity field prefilled with 1. E.g.
-// const title="Staples details",prefix="Staples restock",hint="Tap an item, then adjust the quantity. * I'll show you the flavors available in the store next.";
+// const title="Staples details",prefix="Staples restock",hint="Tap an item, then adjust the quantity. * For online items, I'll show you the flavors available there.";
 // const sections=[{type:"buy",q:"Which dairy and eggs should I restock?",items:[["Eggs","× pack of 10"],["Cream cheese *","× pack"],["Fruits *",""]]}];
 document.getElementById('title').textContent=title;
 const state=new Map();const rows=[];const body=document.getElementById('body');
